@@ -55,6 +55,12 @@ class OrderAdapter (private var orders : MutableList<Order>, private var context
         notifyDataSetChanged()
     }
 
+    fun updateRecords(ords : List<Order>){
+        orders.clear()
+        orders.addAll(ords)
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_order, parent, false))
 
     override fun getItemCount() = orders.size
