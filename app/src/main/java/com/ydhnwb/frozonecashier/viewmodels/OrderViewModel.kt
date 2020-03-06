@@ -41,8 +41,8 @@ class OrderViewModel : ViewModel(){
                 orders.value as MutableList<Order>
             }
             val jsonObj = JSONObject(it.data)
-            val ja_data= jsonObj.getJSONObject("message")
-            val order = Gson().fromJson<Order>(ja_data.toString(), Order::class.java)
+            val ja_dataArr = jsonObj.getJSONArray("message")
+            val order = Gson().fromJson<Order>(ja_dataArr.get(0).toString(), Order::class.java)
             selectedProducts.add(order)
             orders.postValue(selectedProducts)
         }
