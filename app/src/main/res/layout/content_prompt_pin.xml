@@ -1,35 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
-    <TextView
-        android:layout_marginTop="36dp"
-        android:id="@+id/tv_help"
-        android:textAlignment="center"
-        android:textColor="#000"
-        android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="Masukkan PIN untuk melanjutkan"
+    <ImageView
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/ic_doodle_login_alt"
         android:layout_width="wrap_content"
+        android:scaleType="centerCrop"
         android:layout_height="wrap_content"/>
 
-    <com.goodiebag.pinview.Pinview
-        app:cursorVisible="true"
-        android:id="@+id/pin_view"
-        app:inputType="number"
-        app:pinLength="4"
-        app:layout_constraintTop_toBottomOf="@id/tv_help"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_width="wrap_content"
-        app:hint="0"
-        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="36dp"
+            android:id="@+id/tv_help"
+            android:textColor="@color/colorBlack"
+            android:textSize="28sp"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/info_enter_pin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/info_enter_pin_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <com.goodiebag.pinview.Pinview
+            app:cursorVisible="true"
+            android:id="@+id/pin_view"
+            app:inputType="number"
+            app:pinLength="4"
+            android:layout_width="match_parent"
+            app:hint="*"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

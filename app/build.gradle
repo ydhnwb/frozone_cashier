@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
@@ -68,4 +69,9 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:3.10.0"
     implementation 'com.github.GoodieBag:Pinview:v1.4'
     implementation 'com.github.AppIntro:AppIntro:5.1.0'
+
+    def room_version = "2.2.4"
+
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 }
