@@ -10,11 +10,9 @@ import com.pusher.client.channel.SubscriptionEventListener
 import com.pusher.client.connection.ConnectionEventListener
 import com.pusher.client.connection.ConnectionState
 import com.pusher.client.connection.ConnectionStateChange
-import com.ydhnwb.frozonecashier.adapters.OrderAdapter
 import com.ydhnwb.frozonecashier.models.Order
 import com.ydhnwb.frozonecashier.utils.JusticeUtils
 import com.ydhnwb.frozonecashier.utils.SingleLiveEvent
-import kotlinx.android.synthetic.main.content_main.*
 import org.json.JSONObject
 
 class OrderViewModel : ViewModel(){
@@ -42,7 +40,7 @@ class OrderViewModel : ViewModel(){
             }
             val jsonObj = JSONObject(it.data)
             val ja_dataArr = jsonObj.getJSONArray("message")
-            val order = Gson().fromJson<Order>(ja_dataArr.get(0).toString(), Order::class.java)
+            val order = Gson().fromJson(ja_dataArr.get(0).toString(), Order::class.java)
             selectedProducts.add(order)
             orders.postValue(selectedProducts)
         }
