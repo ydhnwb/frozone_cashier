@@ -1,9 +1,6 @@
 package com.ydhnwb.frozonecashier.databases
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.ydhnwb.frozonecashier.models.LocalOrder
 
 @Dao
@@ -14,8 +11,11 @@ interface LocalOrderDao {
     @Query("SELECT * FROM LocalOrder WHERE id = :id LIMIT 1")
     fun findById(id: Int): LocalOrder
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(orderInJson: LocalOrder)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(ordersInJson : List<LocalOrder>)
 
     @Delete
     fun delete(localOrder: LocalOrder)

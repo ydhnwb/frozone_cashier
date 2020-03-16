@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.ydhnwb.frozonecashier.adapters.OrderAdapter
 import com.ydhnwb.frozonecashier.databases.AppDatabase
 import com.ydhnwb.frozonecashier.models.LocalOrder
@@ -23,6 +24,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.etc_no_branch.*
 import kotlinx.android.synthetic.main.etc_waiting_for_transaction.*
+import org.json.JSONArray
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
     private lateinit var orderViewModel: OrderViewModel
@@ -51,9 +54,19 @@ class MainActivity : AppCompatActivity() {
                             emptyViewVisibility(true)
                             noBranchViewVisbility(false)
                         }else{
-                            a.updateRecords(it)
-                            val orderInJson = Gson().toJson(it)
-                            db.localOrderDao().insert(LocalOrder(orderInJson = orderInJson))
+//                            a.updateRecords(it)
+                            val listOrderInJson = mutableListOf<LocalOrder>()
+                            for(order in it){
+                                val orderInJson = Gson().toJson(order)
+                                println(orderInJson)
+                                listOrderInJson.add(LocalOrder(orderInJson = orderInJson))
+                            }
+
+//                            db.localOrderDao().insert(LocalOrder(orderInJson = jObj.toString()))
+                            db.clearAllTables()
+                            db.localOrderDao().insertAll(listOrderInJson).also {
+                                fetchFromLocal()
+                            }
                             emptyViewVisibility(false)
                             noBranchViewVisbility(false)
                         }
@@ -125,7 +138,9 @@ class MainActivity : AppCompatActivity() {
     private fun fetchFromLocal(){
         val localOrders : List<LocalOrder> = db.localOrderDao().getAllLocalOrder()
         val convertedOrder = mutableListOf<Order>()
+        println(localOrders.size)
         for(lo in localOrders){
+//            println(localOrders)
             convertedOrder.add(Gson().fromJson(lo.orderInJson, Order::class.java))
         }
         rv_order.adapter?.let {

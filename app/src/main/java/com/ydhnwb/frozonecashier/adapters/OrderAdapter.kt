@@ -22,7 +22,7 @@ class OrderAdapter (private var orders : MutableList<Order>, private var context
                 if (itemView.order_detail.isExpanded) { itemView.order_detail.collapse()
                 } else { itemView.order_detail.expand() }
             }
-            itemView.order_name.text = order.branch.toString()
+            itemView.order_name.text = order.name.toString()
             var totalQuantity = 0
             var totalPrice = 0
             val products = order.products
