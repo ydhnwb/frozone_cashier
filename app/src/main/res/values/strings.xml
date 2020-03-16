@@ -20,4 +20,8 @@
     <string name="info_waiting_for_transaction">Belum ada orderan masuk kali ini</string>
     <string name="info_enter_pin">Masukkan PIN untuk melanjutkan</string>
     <string name="info_enter_pin_desc">Untuk membuka pengaturan aplikasi ini, masukkan PIN terlebih dahulu. Jika anda tidak mengetahui PIN, hubungi administrator</string>
+    <string name="hint_buyer_name">Nama pembeli</string>
+    <string name="popup_total_price">Rp. 0</string>
+    <string name="btn_process_order">Proses pesanan</string>
+    <string name="btn_delete">Hapus</string>
 </resources>

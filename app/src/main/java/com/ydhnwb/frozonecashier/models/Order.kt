@@ -9,5 +9,6 @@ data class Order(
     @SerializedName("id") var id : Int? = null,
     @SerializedName("name") var name : String? = null,
     @SerializedName("branch") var branch : Int? = null,
-    @SerializedName("products") var products : MutableList<Product>
+    @SerializedName("products") var products : MutableList<Product> = mutableListOf(),
+    var generatedId : String? = null
 ) : Parcelable

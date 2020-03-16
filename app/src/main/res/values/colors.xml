@@ -7,4 +7,5 @@
     <color name="colorBlack">#494949</color>
     <color name="colorGreen">#4CAF50</color>
     <color name="colorWhite">#FFFFFF</color>
+    <color name="colorDanger">#F44336</color>
 </resources>

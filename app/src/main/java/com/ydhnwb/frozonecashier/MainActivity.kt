@@ -19,6 +19,7 @@ import com.ydhnwb.frozonecashier.databases.AppDatabase
 import com.ydhnwb.frozonecashier.models.LocalOrder
 import com.ydhnwb.frozonecashier.models.Order
 import com.ydhnwb.frozonecashier.utils.JusticeUtils
+import com.ydhnwb.frozonecashier.viewmodels.OrderState
 import com.ydhnwb.frozonecashier.viewmodels.OrderViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -41,8 +42,16 @@ class MainActivity : AppCompatActivity() {
             }
         }).start()
         db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "justice_cashier").allowMainThreadQueries().build()
-        fetchFromLocal()
         orderViewModel = ViewModelProvider(this).get(OrderViewModel::class.java)
+        fetchFromLocal()
+
+        orderViewModel.listenToPivotOrder().observe(this, Observer {
+            handleDataFlow(it)
+        })
+        orderViewModel.listenState().observe(this, Observer {
+            handleState(it)
+        })
+
         orderViewModel.listenToOrders().observe(this, Observer {
             rv_order.adapter?.let { a->
                 if(JusticeUtils.getCurrentBranch(this@MainActivity) == 0){
@@ -51,22 +60,11 @@ class MainActivity : AppCompatActivity() {
                 }else{
                     if(a is OrderAdapter){
                         if(it.isEmpty()){
+                            a.updateRecords(it)
                             emptyViewVisibility(true)
                             noBranchViewVisbility(false)
                         }else{
-//                            a.updateRecords(it)
-                            val listOrderInJson = mutableListOf<LocalOrder>()
-                            for(order in it){
-                                val orderInJson = Gson().toJson(order)
-                                println(orderInJson)
-                                listOrderInJson.add(LocalOrder(orderInJson = orderInJson))
-                            }
-
-//                            db.localOrderDao().insert(LocalOrder(orderInJson = jObj.toString()))
-                            db.clearAllTables()
-                            db.localOrderDao().insertAll(listOrderInJson).also {
-                                fetchFromLocal()
-                            }
+                            a.updateRecords(it)
                             emptyViewVisibility(false)
                             noBranchViewVisbility(false)
                         }
@@ -93,7 +91,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupComponent(){
         rv_order.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
+            layoutManager = LinearLayoutManager(this@MainActivity).apply {
+                reverseLayout = true
+                stackFromEnd = true
+            }
             adapter = OrderAdapter(mutableListOf(),this@MainActivity)
         }
     }
@@ -135,18 +136,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun handleState(it: OrderState){
+        when(it){
+            is OrderState.ShowToast -> toast(it.message)
+            is OrderState.AttachToRecycler -> {}
+            is OrderState.ClearLocalDatabase -> { db.clearAllTables() }
+        }
+    }
+
+    private fun handleDataFlow(order : Order){
+        val orderInJson = Gson().toJson(order)
+        db.localOrderDao().insert(LocalOrder(orderInJson =  orderInJson, generatedId = order.generatedId.toString()))
+        val localOrders : List<LocalOrder> = db.localOrderDao().getAllLocalOrder()
+        val convertedOrder = mutableListOf<Order>()
+        for(lo in localOrders){ convertedOrder.add(Gson().fromJson(lo.orderInJson, Order::class.java)) }
+        orderViewModel.updateOrderValue(convertedOrder)
+    }
+
     private fun fetchFromLocal(){
         val localOrders : List<LocalOrder> = db.localOrderDao().getAllLocalOrder()
         val convertedOrder = mutableListOf<Order>()
-        println(localOrders.size)
-        for(lo in localOrders){
-//            println(localOrders)
-            convertedOrder.add(Gson().fromJson(lo.orderInJson, Order::class.java))
-        }
-        rv_order.adapter?.let {
-            if(it is OrderAdapter){
-                it.updateRecords(convertedOrder)
-            }
-        }
+        for(lo in localOrders){ convertedOrder.add(Gson().fromJson(lo.orderInJson, Order::class.java)) }
+        orderViewModel.updateOrderValue(convertedOrder)
     }
 }

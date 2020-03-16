@@ -22,27 +22,21 @@ class OrderViewModel : ViewModel(){
     private var state : SingleLiveEvent<OrderState> = SingleLiveEvent()
     private var orders = MutableLiveData<List<Order>>()
     private var hasSubscribed = MutableLiveData<Boolean>().apply { value = false }
+    private var pivotOrder = MutableLiveData<Order>()
 
     init {
         pusher.connect(object : ConnectionEventListener {
-            override fun onConnectionStateChange(change: ConnectionStateChange?) {
-                println("State changed from " + change?.getPreviousState() + " to " + change?.getCurrentState());
-            }
-            override fun onError(message: String?, code: String?, e: Exception?) {
-                println("Pusher error: $message with code $code because of ${e?.message}")
-            }
+            override fun onConnectionStateChange(change: ConnectionStateChange?) { println("State changed from " + change?.getPreviousState() + " to " + change?.getCurrentState()); }
+            override fun onError(message: String?, code: String?, e: Exception?) { println("Pusher error: $message with code $code because of ${e?.message}") }
         }, ConnectionState.ALL)
+
         eventListener = SubscriptionEventListener {
-            val selectedProducts = if(orders.value == null){
-                mutableListOf()
-            } else {
-                orders.value as MutableList<Order>
-            }
+//            val selectedProducts = if(orders.value == null){ mutableListOf() } else { orders.value as MutableList<Order> }
             val jsonObj = JSONObject(it.data)
             val ja_dataArr = jsonObj.getJSONArray("message")
             val order = Gson().fromJson(ja_dataArr.get(0).toString(), Order::class.java)
-            selectedProducts.add(order)
-            orders.postValue(selectedProducts)
+            order.generatedId = JusticeUtils.getRandomMillis()
+            pivotOrder.postValue(order)
         }
     }
 
@@ -51,11 +45,29 @@ class OrderViewModel : ViewModel(){
         channel.bind(JusticeUtils.EVENT_NAME, eventListener)
     }
 
+    fun deleteOrderAtPosition(position : Int){
+        orders.value?.let {
+            if(!it.isNullOrEmpty()){
+                val reversedOrder : MutableList<Order> = it.reversed().toMutableList()
+                reversedOrder.removeAt(position)
+                reversedOrder.reverse()
+                orders.postValue(reversedOrder)
+            }
+        } ?: kotlin.run {
+            println("The value is null")
+        }
+    }
+    fun updateOrderValue(ors : List<Order>){
+        orders.postValue(ors)
+    }
+
     fun unbindPusher(){ channel.unbind(JusticeUtils.EVENT_NAME, eventListener) }
 
     fun listenState() = state
 
     fun listenToOrders() = orders
+
+    fun listenToPivotOrder() = pivotOrder
 
 
 }
@@ -63,4 +75,5 @@ class OrderViewModel : ViewModel(){
 sealed class OrderState {
     data class AttachToRecycler(var e : String) : OrderState()
     data class ShowToast(var message : String) :OrderState()
+    object ClearLocalDatabase : OrderState()
 }

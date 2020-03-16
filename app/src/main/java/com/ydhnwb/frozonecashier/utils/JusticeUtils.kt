@@ -84,5 +84,14 @@ class JusticeUtils {
             return pref.getString("DEVICE_ID", null)
         }
 
+        fun getRandomMillis() : String {
+            val letters = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l")
+            val s : String = letters.shuffled().take(1)[0]
+            val millis = System.currentTimeMillis()
+            val h = "$millis-$s"
+            println(h)
+            return h
+        }
+
     }
 }

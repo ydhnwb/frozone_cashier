@@ -11,6 +11,9 @@ interface LocalOrderDao {
     @Query("SELECT * FROM LocalOrder WHERE id = :id LIMIT 1")
     fun findById(id: Int): LocalOrder
 
+    @Query("SELECT * FROM LocalOrder WHERE generatedId = :generatedId LIMIT 1")
+    fun findByGeneratedId(generatedId: String): LocalOrder
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(orderInJson: LocalOrder)
 
@@ -19,5 +22,8 @@ interface LocalOrderDao {
 
     @Delete
     fun delete(localOrder: LocalOrder)
+
+    @Query("DELETE FROM LocalOrder WHERE generatedId=:generatedId")
+    fun deleteByGeneratedId(generatedId : String)
 
 }
