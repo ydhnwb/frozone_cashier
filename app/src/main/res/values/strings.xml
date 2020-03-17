@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FrozoneCashier</string>
+    <string name="app_name">Kasir JustIce</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -28,4 +28,6 @@
     <string name="info_success_order">Pesanan berhasil dibuat</string>
     <string name="info_wait">Tunggu sebentar...</string>
     <string name="info_name_cannot_be_blank">Nama pembeli tidak boleh kosong</string>
+    <string name="lorem">Lorem ipsum</string>
+    <string name="info_no_topping">Tidak ada topping dipilih</string>
 </resources>

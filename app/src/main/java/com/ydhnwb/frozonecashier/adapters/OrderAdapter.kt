@@ -9,13 +9,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ydhnwb.frozonecashier.R
 import com.ydhnwb.frozonecashier.models.Order
+import com.ydhnwb.frozonecashier.utils.JusticeUtils
 import com.ydhnwb.frozonecashier.utils.ProcessOrderPopup
 import kotlinx.android.synthetic.main.etc_expandable_child_layout.view.*
 import kotlinx.android.synthetic.main.etc_expandable_parent_layout.view.*
 import kotlinx.android.synthetic.main.list_item_order.view.*
 
 class OrderAdapter (private var orders : MutableList<Order>, private var context : Context) : RecyclerView.Adapter<OrderAdapter.ViewHolder>(){
-
     fun updateRecords(ords : List<Order>){
         orders.clear()
         orders.addAll(ords)
@@ -23,9 +23,7 @@ class OrderAdapter (private var orders : MutableList<Order>, private var context
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item_order, parent, false))
-
     override fun getItemCount() = orders.size
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(orders[position], context)
 
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
@@ -56,7 +54,7 @@ class OrderAdapter (private var orders : MutableList<Order>, private var context
                     adapter = DetailOrderAdapter(it, context)
                 }
             }
-            itemView.order_price.text = "Rp. $totalPrice"
+            itemView.order_price.text = JusticeUtils.setToIDR(totalPrice)
             itemView.order_detail.parentLayout.order_item.text = "$totalQuantity items"
             itemView.setOnClickListener {
                 val fragmentManager = context as AppCompatActivity
