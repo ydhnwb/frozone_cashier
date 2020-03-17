@@ -24,4 +24,8 @@
     <string name="popup_total_price">Rp. 0</string>
     <string name="btn_process_order">Proses pesanan</string>
     <string name="btn_delete">Hapus</string>
+    <string name="info_cannot_order">Tidak dapat membuat pesanan</string>
+    <string name="info_success_order">Pesanan berhasil dibuat</string>
+    <string name="info_wait">Tunggu sebentar...</string>
+    <string name="info_name_cannot_be_blank">Nama pembeli tidak boleh kosong</string>
 </resources>

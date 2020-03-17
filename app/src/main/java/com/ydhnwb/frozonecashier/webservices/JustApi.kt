@@ -41,7 +41,7 @@ interface JusticeAPIService{
     fun getAllBranch() : Call<WrappedListResponse<Branch>>
 
     @Headers("Content-Type: application/json")
-    @POST("api/order")
+    @POST("api/order/confirm")
     fun createOrder(@Body order : String) : Call<WrappedResponse<Order>>
 }
 

@@ -138,6 +138,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleState(it: OrderState){
         when(it){
+            is OrderState.SuccessCreateOrder -> {
+                delete(it.generatedId)
+                toast(resources.getString(R.string.info_success_order))
+            }
+            is OrderState.FailedCreateOrder -> showAlert(resources.getString(R.string.info_cannot_order))
             is OrderState.ShowToast -> toast(it.message)
             is OrderState.AttachToRecycler -> {}
             is OrderState.ClearLocalDatabase -> { db.clearAllTables() }
@@ -158,5 +163,24 @@ class MainActivity : AppCompatActivity() {
         val convertedOrder = mutableListOf<Order>()
         for(lo in localOrders){ convertedOrder.add(Gson().fromJson(lo.orderInJson, Order::class.java)) }
         orderViewModel.updateOrderValue(convertedOrder)
+    }
+
+    private fun delete(generatedId: String){
+        db.localOrderDao().deleteByGeneratedId(generatedId)
+        val localOrders : MutableList<LocalOrder> = db.localOrderDao().getAllLocalOrder() as MutableList<LocalOrder>
+        val convertedOrder = mutableListOf<Order>()
+        for(lo in localOrders){ convertedOrder.add(Gson().fromJson(lo.orderInJson, Order::class.java)) }
+        orderViewModel.updateOrderValue(convertedOrder)
+    }
+
+    private fun showAlert(message : String){
+        val alertDialog = AlertDialog.Builder(this).apply {
+            setMessage(message)
+            setPositiveButton(resources.getString(R.string.info_understand)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            create()
+        }
+        alertDialog.show()
     }
 }
