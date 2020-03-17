@@ -6,6 +6,7 @@ import com.ydhnwb.frozonecashier.models.Order
 import com.ydhnwb.frozonecashier.models.Product
 import com.ydhnwb.frozonecashier.utils.JusticeUtils
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -42,7 +43,7 @@ interface JusticeAPIService{
 
     @Headers("Content-Type: application/json")
     @POST("api/order/confirm")
-    fun createOrder(@Body order : String) : Call<WrappedResponse<Order>>
+    fun createOrder(@Body order : RequestBody) : Call<WrappedResponse<Order>>
 }
 
 data class WrappedResponse<T>(

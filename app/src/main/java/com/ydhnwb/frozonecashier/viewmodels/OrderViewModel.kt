@@ -15,10 +15,13 @@ import com.ydhnwb.frozonecashier.utils.JusticeUtils
 import com.ydhnwb.frozonecashier.utils.SingleLiveEvent
 import com.ydhnwb.frozonecashier.webservices.JustApi
 import com.ydhnwb.frozonecashier.webservices.WrappedResponse
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
 
 class OrderViewModel : ViewModel(){
     private val pusher : Pusher = Pusher(JusticeUtils.PUSHER_KEY, PusherOptions().apply { setCluster(JusticeUtils.CLUSTER_NAME) })
@@ -69,7 +72,8 @@ class OrderViewModel : ViewModel(){
             state.value = OrderState.IsLoading(true)
             val gson = Gson().toJson(order)
             println(gson)
-            api.createOrder(gson).enqueue(object: Callback<WrappedResponse<Order>>{
+            val body: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), gson)
+            api.createOrder(body).enqueue(object: Callback<WrappedResponse<Order>>{
                 override fun onFailure(call: Call<WrappedResponse<Order>>, t: Throwable) {
                     println("onFailure createOrder -> ${t.message}")
                     state.value = OrderState.IsLoading(false)
@@ -90,6 +94,7 @@ class OrderViewModel : ViewModel(){
                     }else{
                         println(response.code())
                         println(response.message())
+                        println(response.errorBody())
                         state.value = OrderState.FailedCreateOrder
                         state.value = OrderState.ShowToast("Tidak dapat mengonfirmasi pesanan")
                     }

@@ -68,6 +68,8 @@ class ProcessOrderPopup : DialogFragment(){
                         view.loading.visibility = View.GONE
                     }
                 }
+                is OrderState.FailedCreateOrder -> this.dismiss()
+                is OrderState.SuccessCreateOrder -> this.dismiss()
             }
         })
         view.process_order_cancel.setOnClickListener {
