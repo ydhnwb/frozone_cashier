@@ -80,6 +80,7 @@ class ProcessOrderPopup : DialogFragment(){
             view.process_order_in_buyername.error = null
             val buyerName = view.process_order_et_buyername.text.toString().trim()
             if(buyerName.isNotEmpty()){
+                order.name = buyerName
                 orderViewModel.processOrder(order)
                 view.process_order_in_buyername.error = null
                 toast(resources.getString(R.string.info_wait))
