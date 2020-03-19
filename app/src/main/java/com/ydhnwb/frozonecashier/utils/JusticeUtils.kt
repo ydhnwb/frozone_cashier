@@ -89,9 +89,7 @@ class JusticeUtils {
             val s : String = letters.shuffled().take(1)[0]
             val millis = System.currentTimeMillis()
             val h = "$millis-$s"
-            println(h)
             return h
         }
-
     }
 }

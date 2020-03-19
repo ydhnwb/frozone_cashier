@@ -30,6 +30,7 @@ import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
     private lateinit var orderViewModel: OrderViewModel
+    private var selectedBranch : Int = 0
     private lateinit var db : AppDatabase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,16 +117,18 @@ class MainActivity : AppCompatActivity() {
             showInfoAlert(resources.getString(R.string.info_no_branch_selected))
             noBranchViewVisbility(true)
             emptyViewVisibility(false)
+        }else{
+            selectedBranch = JusticeUtils.getCurrentBranch(this)
+            if(selectedBranch != 0){
+                val i = JusticeUtils.getCurrentBranch(this@MainActivity)
+                val t = selectedBranch != i
+                orderViewModel.bindPusher(i.toString(), t)
+            }
         }
-        orderViewModel.bindPusher()
     }
 
     private fun noBranchViewVisbility(state : Boolean){
-        if(state){
-            etc_no_branch_view.visibility = View.VISIBLE
-        }else{
-            etc_no_branch_view.visibility = View.GONE
-        }
+        if(state){ etc_no_branch_view.visibility = View.VISIBLE }else{ etc_no_branch_view.visibility = View.GONE }
     }
 
     private fun emptyViewVisibility(state : Boolean){

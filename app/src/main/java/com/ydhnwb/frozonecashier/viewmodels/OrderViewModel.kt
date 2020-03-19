@@ -25,13 +25,14 @@ import retrofit2.Response
 
 class OrderViewModel : ViewModel(){
     private val pusher : Pusher = Pusher(JusticeUtils.PUSHER_KEY, PusherOptions().apply { setCluster(JusticeUtils.CLUSTER_NAME) })
-    private val channel: Channel = pusher.subscribe(JusticeUtils.CHANNEL_NAME)
+    private var channel: Channel? = null
     private var eventListener: SubscriptionEventListener
     private var state : SingleLiveEvent<OrderState> = SingleLiveEvent()
     private var orders = MutableLiveData<List<Order>>()
     private var hasSubscribed = MutableLiveData<Boolean>().apply { value = false }
     private var pivotOrder = MutableLiveData<Order>()
     private var api = JustApi.instance()
+
 
     init {
         pusher.connect(object : ConnectionEventListener {
@@ -40,32 +41,52 @@ class OrderViewModel : ViewModel(){
         }, ConnectionState.ALL)
 
         eventListener = SubscriptionEventListener {
-//            val selectedProducts = if(orders.value == null){ mutableListOf() } else { orders.value as MutableList<Order> }
             val jsonObj = JSONObject(it.data)
-            val ja_dataArr = jsonObj.getJSONArray("message")
-            val order = Gson().fromJson(ja_dataArr.get(0).toString(), Order::class.java)
+            println("Hao")
+            println(jsonObj)
+//            val ja_dataArr = jsonObj.getJSONArray("message")
+            val order = Gson().fromJson(jsonObj.get("message").toString(), Order::class.java)
             order.generatedId = JusticeUtils.getRandomMillis()
             pivotOrder.postValue(order)
         }
     }
 
-    fun bindPusher(){
+
+    fun bindPusher(branchId : String, forceResubscribe : Boolean){
+//        if (channel != null){
+//            println(channel!!.name + " hehe")
+//            if(channel!!.isSubscribed){
+//                if(forceResubscribe){
+//                    unbindPusher()
+//                    channel = pusher.subscribe("${JusticeUtils.CHANNEL_NAME}-$branchId")
+//                    println("h -> is forced, subscribe before")
+//                }else{
+//                    println("h -> is not forced, subscribed before")
+//                }
+//            }else{
+//                println("h -> is not forced, not subscribed before")
+//                channel = pusher.subscribe("${JusticeUtils.CHANNEL_NAME}-$branchId")
+//            }
+//        }else{
+//            println("h -> is null before")
+//            channel = pusher.subscribe("${JusticeUtils.CHANNEL_NAME}-$branchId")
+//        }
+//
+
+        if(channel != null){
+            pusher.unsubscribe("${JusticeUtils.CHANNEL_NAME}-$branchId")
+            if(channel!!.isSubscribed){
+                unbindPusher()
+            }
+            channel = pusher.subscribe("${JusticeUtils.CHANNEL_NAME}-$branchId")
+        }else{
+            channel = pusher.subscribe("${JusticeUtils.CHANNEL_NAME}-$branchId")
+        }
+
         hasSubscribed.value = true
-        channel.bind(JusticeUtils.EVENT_NAME, eventListener)
+        channel?.bind(JusticeUtils.EVENT_NAME, eventListener)
     }
 
-    fun deleteOrderAtPosition(position : Int){
-        orders.value?.let {
-            if(!it.isNullOrEmpty()){
-                val reversedOrder : MutableList<Order> = it.reversed().toMutableList()
-                reversedOrder.removeAt(position)
-                reversedOrder.reverse()
-                orders.postValue(reversedOrder)
-            }
-        } ?: kotlin.run {
-            println("The value is null")
-        }
-    }
 
     fun processOrder(order: Order){
         try{
@@ -111,7 +132,9 @@ class OrderViewModel : ViewModel(){
     }
 
     fun updateOrderValue(ors : List<Order>){ orders.postValue(ors) }
-    fun unbindPusher(){ channel.unbind(JusticeUtils.EVENT_NAME, eventListener) }
+    fun unbindPusher(){
+        channel?.unbind(JusticeUtils.EVENT_NAME, eventListener)
+    }
     fun listenState() = state
     fun listenToOrders() = orders
     fun listenToPivotOrder() = pivotOrder

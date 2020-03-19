@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,7 +17,6 @@ import com.ydhnwb.frozonecashier.adapters.DetailOrderAdapter
 import com.ydhnwb.frozonecashier.databases.AppDatabase
 import com.ydhnwb.frozonecashier.models.LocalOrder
 import com.ydhnwb.frozonecashier.models.Order
-import com.ydhnwb.frozonecashier.models.Product
 import com.ydhnwb.frozonecashier.viewmodels.OrderState
 import com.ydhnwb.frozonecashier.viewmodels.OrderViewModel
 import kotlinx.android.synthetic.main.poppup_process_order.view.*
@@ -51,6 +51,23 @@ class ProcessOrderPopup : DialogFragment(){
             branch = o.branch
             products = o.products
         }
+        var totalQuantity = 0
+        var totalPrice = 0
+        order.products.let {
+            totalQuantity = it.size
+            totalPrice = it.sumBy { p ->
+                var totalPriceTemp: Int = p.price!!
+                if (p.selectedToppings.isNotEmpty()) {
+                    var toppingPrice = 0
+                    for (t in p.selectedToppings) {
+                        toppingPrice += t.price!!
+                    }
+                    totalPriceTemp += toppingPrice
+                }
+                totalPriceTemp
+            }
+        }
+        view.process_order_price.text = JusticeUtils.setToIDR(totalPrice)
         view.process_order_rv.adapter = order.products.let { DetailOrderAdapter(it, activity!!) }
         orderViewModel = ViewModelProvider(activity!!).get(OrderViewModel::class.java)
         orderViewModel.listenState().observe(viewLifecycleOwner, Observer {
@@ -77,15 +94,19 @@ class ProcessOrderPopup : DialogFragment(){
             this.dismiss()
         }
         view.process_order_process.setOnClickListener {
-            view.process_order_in_buyername.error = null
-            val buyerName = view.process_order_et_buyername.text.toString().trim()
-            if(buyerName.isNotEmpty()){
-                order.name = buyerName
-                orderViewModel.processOrder(order)
+            if(JusticeUtils.getCurrentBranch(activity!!) != 0){
                 view.process_order_in_buyername.error = null
-                toast(resources.getString(R.string.info_wait))
+                val buyerName = view.process_order_et_buyername.text.toString().trim()
+                if(buyerName.isNotEmpty()){
+                    order.name = buyerName
+                    orderViewModel.processOrder(order)
+                    view.process_order_in_buyername.error = null
+                    toast(resources.getString(R.string.info_wait))
+                }else{
+                    view.process_order_in_buyername.error = resources.getString(R.string.info_name_cannot_be_blank)
+                }
             }else{
-                view.process_order_in_buyername.error = resources.getString(R.string.info_name_cannot_be_blank)
+                showAlert(resources.getString(R.string.info_no_branch_selected))
             }
         }
     }
@@ -103,4 +124,14 @@ class ProcessOrderPopup : DialogFragment(){
     }
 
     private fun toast(message : String) = Toast.makeText(activity, message,Toast.LENGTH_LONG).show()
+    private fun showAlert(message : String){
+        val alertDialog = AlertDialog.Builder(activity!!).apply {
+            setMessage(message)
+            setPositiveButton(resources.getString(R.string.info_understand)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            create()
+        }
+        alertDialog.show()
+    }
 }

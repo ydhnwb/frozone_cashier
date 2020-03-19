@@ -20,16 +20,20 @@ class DetailOrderAdapter (private var detailOrders : MutableList<Product>, priva
         fun bind(product: Product, context: Context){
             itemView.product_name.text = product.name
             itemView.product_price.text = JusticeUtils.setToIDR(product.price!!)
-            itemView.product_topping_name.text = product.selectedToppings.joinToString { t -> t.name.toString() }
+            itemView.product_topping_name.text = product.selectedToppings.let {
+                if(it.isEmpty()){
+                    context.resources.getString(R.string.info_no_topping)
+                }else{
+                    product.selectedToppings.joinToString { t -> t.name.toString() }
+                }
+            }
             itemView.product_topping_price.text = product.selectedToppings.let { toppings ->
                 if(toppings.isNotEmpty()){
                     var temp = 0
-                    for (t in toppings){
-                        temp += t.price!!
-                    }
+                    for (t in toppings){ temp += t.price!! }
                     JusticeUtils.setToIDR(temp)
                 }else{
-                    context.resources.getString(R.string.info_no_topping)
+                    "-"
                 }
             }
             itemView.setOnClickListener {
